@@ -42,8 +42,7 @@ use Doctrine\ORM\QueryBuilder;
  * Package  Concrete\Package\BaclucProductPackage\Src
  * @DiscriminatorEntry(value="Concrete\Package\BaclucInvoicePackage\Src\VersionedProduct")
  * @Entity
-@Table(name="bacluc_versioned_product"
-)
+* @Table(name="bacluc_versioned_product")
  *
  */
 class VersionedProduct extends Product
@@ -51,15 +50,24 @@ class VersionedProduct extends Product
     use EntityGetterSetter;
 
     /**
-     * @var bool
-     * @Column(type="boolean")
+     * @var int
+     * @Id @Column(type="integer")
+     * @GEneratedValue(strategy="AUTO")
      */
-    protected $depricated = false;
+    protected $id;
+
+
     /**
      * @var VersionedProduct
      * @ManyToOne(targetEntity="Concrete\Package\BaclucInvoicePackage\Src\VersionedProduct")
      */
     protected $NewVersion;
+
+    /**
+     * @var bool
+     * @Column(type="boolean")
+     */
+    protected $depricated = false;
 
 
 
@@ -126,12 +134,14 @@ VersionedProduct::$staticEntityfilterfunction = function(QueryBuilder $query, ar
     $newversion = $queryConfig['NewVersion']['shortname'];
     $query->andWhere(
         $query->expr()->andX(
-            $query->expr()->eq($newversion.".depricated", ":VersionendProductdepricated"),
+            $query->expr()->eq($firstEntityName.".depricated", ":VersionendProductdepricated")
+            ,
             $query->expr()->isNull($newversion)
             )
 
 
     );
     $query->setParameter(":VersionendProductdepricated", false);
+
     return $query;
 };

@@ -53,6 +53,9 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
      */
     protected $btDefaultSet = 'bacluc_product_set';
 
+
+    protected $showOldAndDepricated = false;
+
     /**
      *
      * Controller constructor.
@@ -92,7 +95,41 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
         $this->requiredOptions[2]->set('optionName', "testlink");
 */
 
+        if(isset($_SESSION[$this->getHTMLId() . "showDepricated"])){
+            $this->setShowOldAndDepricated($_SESSION[$this->getHTMLId() . "showDepricated"]);
+        }
 
+
+
+
+
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isShowOldAndDepricated()
+    {
+        return $this->showOldAndDepricated;
+    }
+
+    /**
+     * @param boolean $showOldAndDepricated
+     * @return $this
+     */
+    public function setShowOldAndDepricated($showOldAndDepricated)
+    {
+        $_SESSION[$this->getHTMLId() . "showDepricated"] = $showOldAndDepricated;
+        $this->showOldAndDepricated = $showOldAndDepricated;
+        return $this;
+    }
+
+    public function action_show_depricated($args){
+        $this->setShowOldAndDepricated(true);
+    }
+
+    public function action_hide_depricated($args){
+        $this->setShowOldAndDepricated(false);
     }
 
 
@@ -142,7 +179,9 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
             $model = new VersionedProduct();
             $oldmodel->set("NewVersion", $model);
             $this->getEntityManager()->persist($oldmodel);
+
         }
+        $v['depricated']=false;
 
         if($this->persistValues($model, $v) === false){
             return false;
@@ -182,7 +221,20 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
 
     public function addFilterToQuery(QueryBuilder $query, array $queryConfig = array())
     {
-        //TODO add if show old version and depricated
+        if($this->isShowOldAndDepricated()){
+            $firstEntityName = $queryConfig['fromEntityStart']['shortname'];
+            $newversion = $queryConfig['NewVersion']['shortname'];
+            $query->orWhere(
+                $query->expr()->orX(
+                    $query->expr()->eq($firstEntityName.".depricated", ":BlockVersionendProductdepricated")
+                    ,
+                    $query->expr()->isNotNull($newversion)
+                )
+
+
+            );
+            $query->setParameter(":BlockVersionendProductdepricated", true);
+        }
         return $query;
     }
 
