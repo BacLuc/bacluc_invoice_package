@@ -1,0 +1,17 @@
+owncloud/config/config.php
+.buildpath
+.project
+.settings/
+.gitignore~
+concrete5/application/config/database.php
+concrete5/application/config/doctrine/*
+concrete5/application/files/cache/*
+.idea/*
+.idea/
+.idea
+config/site.php
+files/cache/*
+files/tmp/*
+concrete5/application/config/generated_overrides/concrete.php
+concrete5/application/config/generated_overrides/*
+owncloud/data/*
