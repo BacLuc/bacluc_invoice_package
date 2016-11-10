@@ -159,10 +159,30 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
 
     }
 
+    public function deleteRow()
+    {
+        $model = $this->getEntityManager()->getRepository(get_class($this->model))->findOneBy(array($this->model->getIdFieldName() => $this->editKey));
+        $model->set("depricated", true);
+        $this->getEntityManager()->persist($model);
+        $this->getEntityManager()->flush();
+        $r = true;
+        $_SESSION[$this->getHTMLId()]['prepareFormEdit'] = false;
+        if (isset($_SESSION[$this->getHTMLId() . "rowid"])) {
+            unset($_SESSION[$this->getHTMLId() . "rowid"]);
+
+        }
+        $this->editKey = null;
+
+        if ($r) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function addFilterToQuery(QueryBuilder $query, array $queryConfig = array())
     {
-        $entityStart = $queryConfig['NewVersion']['shortname'];
-        $query->andWhere($query->expr()->isNull($entityStart));
+        //TODO add if show old version and depricated
         return $query;
     }
 
