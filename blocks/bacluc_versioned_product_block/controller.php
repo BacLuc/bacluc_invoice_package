@@ -313,12 +313,13 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
         $this->editKey = $_POST['rowid'];
         //save it in the session
         $_SESSION[$this->getHTMLId() . "rowid"] = $this->editKey;
+        $row = $this->getRowValues();
 
-        if ($_POST['action'] == 'edit') {
+        if ($_POST['action'] == 'edit' && strlen($this->getEditActionIcon($row))>0) {
             $this->prepareFormEdit();
-        } elseif ($_POST['action'] == 'delete') {
+        } elseif ($_POST['action'] == 'delete' && strlen($this->getDeleteActionIcon($row))>0 ) {
             $this->deleteRow();
-        }elseif ($_POST['action'] == 'restore') {
+        }elseif ($_POST['action'] == 'restore' && strlen($this->getRestoreActionIcon($row))>0) {
             $this->restoreRow();
         }
     }
@@ -347,6 +348,9 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
         $fields =  parent::getFields();
         if($this->isShowOldAndDepricated()){
             $fields['depricated']->setShowInTable(true);
+            $fields['NewVersion']->setShowInTable(true);
+        }else{
+            $fields['NewVersion']->setShowInTable(false);
         }
         return $fields;
     }
