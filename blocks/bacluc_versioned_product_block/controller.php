@@ -238,5 +238,14 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
         return $query;
     }
 
+    public function getFields()
+    {
+        $fields =  parent::getFields();
+        if($this->isShowOldAndDepricated()){
+            $fields['depricated']->setShowInTable(true);
+        }
+        return $fields;
+    }
+
 
 }
