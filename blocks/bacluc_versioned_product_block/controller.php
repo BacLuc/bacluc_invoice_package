@@ -322,6 +322,8 @@ class Controller extends \Concrete\Package\BasicTablePackage\Block\BasicTableBlo
         }elseif ($_POST['action'] == 'restore' && strlen($this->getRestoreActionIcon($row))>0) {
             $this->restoreRow();
         }
+        $this->redirectToView();
+
     }
 
     public function addFilterToQuery(QueryBuilder $query, array $queryConfig = array())
