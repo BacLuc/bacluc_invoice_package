@@ -77,10 +77,12 @@ class Controller extends Package
             $db = Core::make('database');
 
             //remove unversioned product block
-            $db->query("DELETE FROM BlockTypes WHERE pkgID = ? AND btHandle = ?", array($this->getPackageID(),"bacluc_product_block"));
 
 
             BlockType::installBlockType("bacluc_versioned_product_block", $pkg);
+            $productPackage = Package::getByHandle("bacluc_product_package");
+            $db->query("DELETE FROM BlockTypes WHERE pkgID = ? AND btHandle = ?", array($productPackage->getPackageID(),"bacluc_product_block"));
+
             $em->getConnection()->commit();
         }catch(Exception $e){
             $em->getConnection()->rollBack();
