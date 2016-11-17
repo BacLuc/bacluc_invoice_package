@@ -93,6 +93,7 @@ class InvoiceLine extends BaseEntity//TODO change class name
     public function setDefaultFieldTypes()
     {
         parent::setDefaultFieldTypes();
+        $this->fieldTypes['Invoice']->setShowInForm(false);
 
     }
 
@@ -105,7 +106,7 @@ class InvoiceLine extends BaseEntity//TODO change class name
             }
             $product = $item->Product;
             $product = BaseEntity::getBaseEntityFromProxy($product);
-            $displayStringFunction = Person::getDefaultGetDisplayStringFunction();
+            $displayStringFunction = VersionedProduct::getDefaultGetDisplayStringFunction();
             $productString = $displayStringFunction($product);
             if(strlen($productString)>0){
                 $returnString.=$productString." ";

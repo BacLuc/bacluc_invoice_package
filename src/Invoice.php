@@ -8,6 +8,7 @@
 
 namespace Concrete\Package\BaclucInvoicePackage\Src; //TODO change namespace
 //TODO CHANGE use statemetns
+use Concrete\Core\Form\Service\Widget\DateTime;
 use Concrete\Package\BaclucPersonPackage\Src\Person;
 use Concrete\Package\BasicTablePackage\Src\EntityGetterSetter;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityField;
@@ -116,9 +117,30 @@ class Invoice extends BaseEntity//TODO change class name
     public function setDefaultFieldTypes()
     {
         parent::setDefaultFieldTypes();
-        $this->fieldTypes['number']->setDefault();
+        $classname = get_class($this);
+        $query = $this->getEntityManager()->createQuery("SELECT max(i.id) as maxim FROM $classname i");
+        $max = $query->getScalarResult();
+        $max = $max[0]['maxim'];
+        if(is_null($max)){
+            $max = 0;
+        }
+        $this->fieldTypes['number']->setDefault($max+1);
 
         $this->fieldTypes['amount']->setShowInForm(false);
+
+
+        $this->fieldTypes['invoicedate']->setDefault(new \DateTime());
+
+        /**
+         * @var DropdownMultilinkField $oldtype
+         * //TODO if you want to convert a field to a DirectEditAssociatedEntityMultipleField or DirectEditAssociatedEntityField
+         * do it like this
+         */
+        $oldtype = $this->fieldTypes['InvoiceLines'];
+        $directEditField = new DirectEditAssociatedEntityMultipleField($oldtype->getSQLFieldName(), "Invoice Lines", $oldtype->getPostName());
+        DropdownLinkField::copyLinkInfo($oldtype,$directEditField);
+        $this->fieldTypes['InvoiceLines']=$directEditField;
+        $this->fieldTypes['InvoiceLines']->setNullable(false);
 
 
     }
@@ -151,6 +173,39 @@ class Invoice extends BaseEntity//TODO change class name
             return $returnString;
         };
         return $function;
+    }
+
+
+    public function checkConsistency()
+    {
+        $errors = array();
+        if($this->checkingConsistency){
+            throw new ConsistencyCheckException();
+        }
+        $this->checkingConsistency = true;
+        $amount = 0;
+        if(count($this->InvoiceLines)==0){
+
+        }else{
+            foreach($this->InvoiceLines->toArray() as &$InvoiceLine){
+                $classname = get_class($InvoiceLine);
+                $InvoiceLine = $classname::getBaseEntityFromProxy($InvoiceLine);
+
+
+                $amount += $InvoiceLine->amount;
+
+            }
+        }
+
+
+
+
+        $this->amount = $amount;
+
+        $this->checkingConsistency = false;
+        $this->getEntityManager()->persist($this);
+
+        return $errors;
     }
 
 

@@ -86,6 +86,9 @@ class Controller extends Package
             //TODO convert to ORM query
             $db->query("UPDATE bacluc_product SET discr = ?", array("Concrete\\Package\\BaclucInvoicePackage\\Src\\VersionedProduct"));
             //insert for every product which is not yet a versioned product a row in verioned product
+
+            BlockType::installBlockType("bacluc_invoice_block", $pkg);
+
             $em->getConnection()->commit();
         }catch(Exception $e){
             $em->getConnection()->rollBack();
