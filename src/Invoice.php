@@ -188,11 +188,15 @@ class Invoice extends BaseEntity//TODO change class name
 
         }else{
             foreach($this->InvoiceLines->toArray() as &$InvoiceLine){
+                /**
+                 * @var InvoiceLine $InvoiceLine
+                 */
                 $classname = get_class($InvoiceLine);
                 $InvoiceLine = $classname::getBaseEntityFromProxy($InvoiceLine);
 
 
-                $amount += $InvoiceLine->amount;
+
+                $amount += $InvoiceLine->Product->price * $InvoiceLine->amount;
 
             }
         }
