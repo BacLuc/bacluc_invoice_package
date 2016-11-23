@@ -91,7 +91,7 @@ class VersionedProduct extends Product
         parent::setDefaultFieldTypes();
 
         $this->fieldTypes['NewVersion'] = new DropdownLinkField("NewVersion", "Old Version of","postNewVersion");
-        $this->fieldTypes['NewVersion']->setLinkInfo($this,"NewVersion",get_class($this),null,static::getDefaultGetDisplayStringFunction() );
+        $this->fieldTypes['NewVersion']->setLinkInfo($this,"NewVersion",get_class($this),null,null,static::getDefaultGetDisplayStringFunction() );
         $this->fieldTypes['NewVersion']->setShowInForm(false);
 
         $this->fieldTypes['depricated'] = new BooleanField("depricated", "Depricated", "postdepricated");
