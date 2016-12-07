@@ -11,6 +11,7 @@ use Concrete\Package\BaclucProductPackage\Src\Product;
 use Concrete\Package\BasicTablePackage\Src\BaseEntity;
 use Concrete\Package\BasicTablePackage\Src\EntityGetterSetter;
 use Concrete\Package\BasicTablePackage\Src\Exceptions\ConsistencyCheckException;
+use Concrete\Package\BasicTablePackage\Src\FieldTypes\BooleanField;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DateField as DateField;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityField;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DropdownField;
@@ -34,25 +35,41 @@ use Doctrine\ORM\Mapping\InheritanceType;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Concrete\Package\BasicTablePackage\Src\DiscriminatorEntry\DiscriminatorEntry;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class VersionedProduct
  * Package  Concrete\Package\BaclucProductPackage\Src
- * @DiscriminatorColumn(name="discr", type="string")
  * @DiscriminatorEntry(value="Concrete\Package\BaclucInvoicePackage\Src\VersionedProduct")
  * @Entity
-@Table(name="bacluc_versioned_product"
-)
+* @Table(name="bacluc_versioned_product")
  *
  */
 class VersionedProduct extends Product
 {
     use EntityGetterSetter;
+    //dontchange
+    public static $staticEntityfilterfunction; //that you have a filter that is only for this entity
+
+    /**
+     * @var int
+     * @Id @Column(type="integer")
+     * @GEneratedValue(strategy="AUTO")
+     */
+    protected $id;
+
+
     /**
      * @var VersionedProduct
      * @ManyToOne(targetEntity="Concrete\Package\BaclucInvoicePackage\Src\VersionedProduct")
      */
     protected $NewVersion;
+
+    /**
+     * @var bool
+     * @Column(type="boolean")
+     */
+    protected $depricated = false;
 
 
 
@@ -76,8 +93,12 @@ class VersionedProduct extends Product
         parent::setDefaultFieldTypes();
 
         $this->fieldTypes['NewVersion'] = new DropdownLinkField("NewVersion", "Old Version of","postNewVersion");
-        $this->fieldTypes['NewVersion']->setLinkInfo($this,"NewVersion",get_class($this),null,static::getDefaultGetDisplayStringFunction() );
+        $this->fieldTypes['NewVersion']->setLinkInfo($this,"NewVersion",get_class($this),null,null,static::getDefaultGetDisplayStringFunction() );
         $this->fieldTypes['NewVersion']->setShowInForm(false);
+
+        $this->fieldTypes['depricated'] = new BooleanField("depricated", "Depricated", "postdepricated");
+        $this->fieldTypes['depricated']->setShowInForm(false);
+        $this->fieldTypes['depricated']->setShowInTable(false);
     }
 
 
@@ -107,4 +128,22 @@ class VersionedProduct extends Product
 
 
 
+
 }
+
+VersionedProduct::$staticEntityfilterfunction = function(QueryBuilder $query, array $queryConfig = array()){
+    $firstEntityName = $queryConfig['fromEntityStart']['shortname'];
+    $newversion = $queryConfig['NewVersion']['shortname'];
+    $query->andWhere(
+        $query->expr()->andX(
+            $query->expr()->eq($firstEntityName.".depricated", ":VersionendProductdepricated")
+            ,
+            $query->expr()->isNull($newversion)
+            )
+
+
+    );
+    $query->setParameter(":VersionendProductdepricated", false);
+
+    return $query;
+};

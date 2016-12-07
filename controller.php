@@ -77,10 +77,18 @@ class Controller extends Package
             $db = Core::make('database');
 
             //remove unversioned product block
-            $db->query("DELETE FROM BlockTypes WHERE pkgID = ? AND btHandle = ?", array($this->getPackageID(),"bacluc_product_block"));
 
 
             BlockType::installBlockType("bacluc_versioned_product_block", $pkg);
+            $productPackage = Package::getByHandle("bacluc_product_package");
+            $db->query("DELETE FROM BlockTypes WHERE pkgID = ? AND btHandle = ?", array($productPackage->getPackageID(),"bacluc_product_block"));
+            //convert all Products to versioned products
+            //TODO convert to ORM query
+            $db->query("UPDATE bacluc_product SET discr = ?", array("Concrete\\Package\\BaclucInvoicePackage\\Src\\VersionedProduct"));
+            //insert for every product which is not yet a versioned product a row in verioned product
+
+            BlockType::installBlockType("bacluc_invoice_block", $pkg);
+
             $em->getConnection()->commit();
         }catch(Exception $e){
             $em->getConnection()->rollBack();
@@ -98,6 +106,14 @@ class Controller extends Package
 
             //delete of blocktype not in orm way, because there is no entity BlockType
             $db->query("DELETE FROM BlockTypes WHERE pkgID = ?", array($this->getPackageID()));
+            $productPackage = Package::getByHandle("bacluc_product_package");
+            BlockType::installBlockType("bacluc_product_block", $productPackage);
+            //convert all versioned products back to products
+            //TODO convert to ORM query
+            $db->query("UPDATE bacluc_product SET discr = ?", array("Concrete\\Package\\BaclucProductPackage\\Src\\Product"));
+
+
+
 
             parent::uninstall();
             $em->getConnection()->commit();
