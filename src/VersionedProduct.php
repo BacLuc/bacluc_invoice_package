@@ -48,6 +48,8 @@ use Doctrine\ORM\QueryBuilder;
 class VersionedProduct extends Product
 {
     use EntityGetterSetter;
+    //dontchange
+    public static $staticEntityfilterfunction; //that you have a filter that is only for this entity
 
     /**
      * @var int
