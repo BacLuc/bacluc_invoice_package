@@ -9,6 +9,7 @@ namespace Concrete\Package\BaclucInvoicePackage\Src;
 use Concrete\Core\Html\Object\Collection;
 use Concrete\Package\BaclucProductPackage\Src\Product;
 use Concrete\Package\BasicTablePackage\Src\BaseEntity;
+use Concrete\Package\BasicTablePackage\Src\BaseEntityRepository;
 use Concrete\Package\BasicTablePackage\Src\EntityGetterSetter;
 use Concrete\Package\BasicTablePackage\Src\Exceptions\ConsistencyCheckException;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\BooleanField;
@@ -108,7 +109,7 @@ class VersionedProduct extends Product
      */
     public static function getDefaultGetDisplayStringFunction(){
         $function = function(VersionedProduct $item){
-            $item = BaseEntity::getBaseEntityFromProxy($item);
+            $item = BaseEntityRepository::getBaseEntityFromProxy($item);
             $returnString = '';
             if(strlen($item->code) >0){
                 $returnString.= $item->code." ";

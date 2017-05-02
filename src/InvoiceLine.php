@@ -8,6 +8,7 @@
 
 namespace Concrete\Package\BaclucInvoicePackage\Src; //TODO change namespace
 //TODO CHANGE use statemetns
+use Concrete\Package\BasicTablePackage\Src\BaseEntityRepository;
 use Concrete\Package\BasicTablePackage\Src\EntityGetterSetter;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityField;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityMultipleField;
@@ -105,7 +106,7 @@ class InvoiceLine extends BaseEntity//TODO change class name
                 $returnString.=$item->id." ";
             }
             $product = $item->Product;
-            $product = BaseEntity::getBaseEntityFromProxy($product);
+            $product = BaseEntityRepository::getBaseEntityFromProxy($product);
             $displayStringFunction = VersionedProduct::getDefaultGetDisplayStringFunction();
             $productString = $displayStringFunction($product);
             if(strlen($productString)>0){

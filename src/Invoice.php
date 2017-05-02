@@ -10,6 +10,7 @@ namespace Concrete\Package\BaclucInvoicePackage\Src; //TODO change namespace
 //TODO CHANGE use statemetns
 use Concrete\Core\Form\Service\Widget\DateTime;
 use Concrete\Package\BaclucPersonPackage\Src\Person;
+use Concrete\Package\BasicTablePackage\Src\BaseEntityRepository;
 use Concrete\Package\BasicTablePackage\Src\EntityGetterSetter;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityField;
 use Concrete\Package\BasicTablePackage\Src\FieldTypes\DirectEditAssociatedEntityMultipleField;
@@ -148,7 +149,7 @@ class Invoice extends BaseEntity//TODO change class name
 
     public static function getDefaultGetDisplayStringFunction(){
         $function = function(Invoice $item){//TODO change this function that it returns a unique string
-            $item = BaseEntity::getBaseEntityFromProxy($item);
+            $item = BaseEntityRepository::getBaseEntityFromProxy($item);
             $dateField = new DateField("test", "test", "test");
             $returnString ="";
             if(strlen($item->number)>0){
@@ -160,7 +161,7 @@ class Invoice extends BaseEntity//TODO change class name
                 $returnString.=$item->amount." ";
             }
             $person = $item->Person;
-            $person = BaseEntity::getBaseEntityFromProxy($person);
+            $person = BaseEntityRepository::getBaseEntityFromProxy($person);
             $displayStringFunction = Person::getDefaultGetDisplayStringFunction();
             $personString = $displayStringFunction($person);
             if(strlen($personString)>0){
